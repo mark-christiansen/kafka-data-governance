@@ -1,0 +1,4 @@
+Manifest-Version: 1.0
+Premain-Class: com.mycompany.kafka.governance.agent.AgentMain
+Agent-Class: com.mycompany.kafka.governance.agent.AgentMain
+Can-Redefine-Classes: true

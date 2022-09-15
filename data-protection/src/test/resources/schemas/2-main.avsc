@@ -1,0 +1,92 @@
+{
+  "type": "record",
+  "name": "Main",
+  "namespace": "com.mycompany.kafka.model.test",
+  "fields":
+  [
+    {
+      "name": "long",
+      "type": "long"
+    },
+    {
+      "name": "nullableLong",
+      "type": [
+        "null",
+        "long"
+      ],
+      "default": null
+    },
+    {
+      "name": "string",
+      "type": "string"
+    },
+    {
+      "name": "nullableString",
+      "type": [
+        "null",
+        "string"
+      ],
+      "default": null
+    },
+    {
+      "name": "bytes",
+      "type": "bytes"
+    },
+    {
+      "name": "nullableBytes",
+      "type": [
+        "null",
+        "bytes"
+      ],
+      "default": null
+    },
+    {
+      "name": "stringArray",
+      "type": {
+          "type": "array",
+          "items": "string"
+       }
+    },
+    {
+      "name": "nullableStringArray",
+      "type": [
+        "null",
+        {
+          "type": "array",
+          "items": "string"
+        }
+      ],
+      "default": null
+    },
+    {
+      "name": "bytesArray",
+      "type": {
+        "type": "array",
+        "items": "bytes"
+      }
+    },
+    {
+      "name": "nullableBytesArray",
+      "type": [
+        "null",
+        {
+          "type": "array",
+          "items": "bytes"
+        }
+      ],
+      "default": null
+    },
+    {
+      "name": "record",
+      "type": "Nested"
+    },
+    {
+      "name": "nullableRecord",
+      "type": [
+        "null",
+        "Nested"
+      ],
+      "default": null
+    }
+  ]
+}
