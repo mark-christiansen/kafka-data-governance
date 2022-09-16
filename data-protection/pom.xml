@@ -27,6 +27,7 @@
     <properties>
         <snakeyaml.version>1.32</snakeyaml.version>
         <jackson.version>2.13.4</jackson.version>
+        <opennlp.version>2.0.0</opennlp.version>
     </properties>
 
     <dependencies>
@@ -56,6 +57,11 @@
             <groupId>com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-core</artifactId>
             <version>${jackson.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.opennlp</groupId>
+            <artifactId>opennlp-tools</artifactId>
+            <version>${opennlp.version}</version>
         </dependency>
         <dependency>
             <groupId>ch.qos.logback</groupId>

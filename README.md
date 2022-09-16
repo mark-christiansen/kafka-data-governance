@@ -115,24 +115,28 @@ folder. Below is an example of this file.
 rules:
   - record: "com.mycompany.kafka.model.Customer"
     field: "creditCardNumber"
-    type: "pattern-matching"
+    type: "pattern-match"
     regex: "^4[0-9]{12}(?:[0-9]{3})?$"
   - record: "com.mycompany.kafka.model.Customer"
     field: "firstName"
-    type: "pattern-matching"
+    type: "pattern-match"
     regex: "^M.*$"
+  - record: "com.mycompany.kafka.model.Customer"
+    field: "lastName"
+    type: "proper-name-match"
 ```
 Underneath the `rules` property is a list of rules which contain the following properties:
 * `record`: The full Avro record name ("<record-namespace>.<record-name>")
 * `field`: The Avro field name which can be nested (ex: `address.addressLine1` is the field `address`'s field `addressLine1`)
-* `type`: The type of rule (only `pattern-matching` is currently supported)
-The `pattern-matching` rule also contains a `regex` property that is a regular expression that matches values that 
+* `type`: The type of rule (only `pattern-match` and `proper-name-match` is currently supported)
+
+### Pattern Match Rule
+
+The `pattern-match` rule also contains a `regex` property that is a regular expression that matches values that 
 "violate" the rule. For instance, if first names that start with the letter `M` are rule violations you would set the
 property `regex` as `^M.*$`.
 
-### Rule Requirements
-
-The rules can only be applied to certain Avro record field types. The field can be the following 
+The `pattern-match` rule can only be applied to certain Avro record field types. The field can be the following 
 [Avro Primitive Types](https://avro.apache.org/docs/1.11.1/specification/#primitive-types):
 
 * `string`
@@ -143,5 +147,20 @@ provided that its items are in primitive types listed above. Also, the field can
 [Avro Complex Type](https://avro.apache.org/docs/1.11.1/specification/#complex-types) provided that the nested field
 has a value matching the primitive types listed above.
 
+### Proper Name Match Rule
 
+The `proper-name-match` rule matches values that resemble English proper names (first name, last name or full name). It
+only matches the value if the name is capitalized correctly. It will not detect names that are all lowercase or all 
+uppercase. The English name model is the [Open NLP Model](http://opennlp.sourceforge.net/models-1.5/) named 
+`en-ner-person.bin` which was downloaded from [here](http://opennlp.sourceforge.net/models-1.5/en-ner-person.bin).
 
+The `proper-name-match` rule can only be applied to certain Avro record field types. The field can be the following
+[Avro Primitive Types](https://avro.apache.org/docs/1.11.1/specification/#primitive-types):
+
+* `string`
+* `bytes`
+
+The field can also be an `array` [Avro Complex Type](https://avro.apache.org/docs/1.11.1/specification/#complex-types)
+provided that its items are in primitive types listed above. Also, the field can be nested in a `record`
+[Avro Complex Type](https://avro.apache.org/docs/1.11.1/specification/#complex-types) provided that the nested field
+has a value matching the primitive types listed above.

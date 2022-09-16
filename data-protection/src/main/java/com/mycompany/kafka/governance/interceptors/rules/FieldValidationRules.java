@@ -14,7 +14,8 @@ public class FieldValidationRules {
     private static final String RECORD = "record";
     private static final String FIELD = "field";
     private static final String TYPE = "type";
-    private static final String PATTERN_MATCHING_TYPE = "pattern-matching";
+    private static final String PATTERN_MATCH_TYPE = "pattern-match";
+    private static final String PROPER_NAME_MATCH_TYPE = "proper-name-match";
     private static final String REGEX = "regex";
 
     private final Map<String, List<FieldValidationRule>> rules = new HashMap<>();
@@ -28,8 +29,10 @@ public class FieldValidationRules {
             String type = ruleConfigs.get(TYPE);
 
             List<FieldValidationRule> recordRules = rules.computeIfAbsent(recordName, k -> new ArrayList<>());
-            if (PATTERN_MATCHING_TYPE.equals(type)) {
-                recordRules.add(new PatternMatchingRule(recordName, ruleConfigs.get(FIELD), ruleConfigs.get(REGEX)));
+            if (PATTERN_MATCH_TYPE.equals(type)) {
+                recordRules.add(new PatternMatchRule(recordName, ruleConfigs.get(FIELD), ruleConfigs.get(REGEX)));
+            } else if (PROPER_NAME_MATCH_TYPE.equals(type)) {
+                recordRules.add(new ProperNameMatchRule(recordName, ruleConfigs.get(FIELD)));
             } else {
                 throw new UnsupportedOperationException("The rule type \"" + type + "\" is not supported");
             }
