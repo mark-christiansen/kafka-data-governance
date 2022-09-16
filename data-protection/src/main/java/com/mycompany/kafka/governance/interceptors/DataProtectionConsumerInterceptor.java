@@ -4,6 +4,7 @@ import com.mycompany.kafka.governance.interceptors.rules.FieldValidationRules;
 import com.mycompany.kafka.governance.interceptors.rules.RuleViolation;
 import com.mycompany.kafka.governance.interceptors.util.ClientIdGenerator;
 
+import com.mycompany.kafka.governance.interceptors.util.JsonSerializer;
 import io.confluent.kafka.schemaregistry.client.CachedSchemaRegistryClient;
 import io.confluent.kafka.schemaregistry.client.SchemaRegistryClient;
 import io.confluent.kafka.serializers.AbstractKafkaSchemaSerDeConfig;

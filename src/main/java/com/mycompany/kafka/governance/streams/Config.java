@@ -1,4 +1,4 @@
-package com.mycompany.kafka.streams;
+package com.mycompany.kafka.governance.streams;
 
 import com.mycompany.kafka.streams.common.StreamsLifecycle;
 import com.mycompany.kafka.streams.common.SerdeCreator;
@@ -16,14 +16,11 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
 
-@SuppressWarnings("unused")
 @Configuration
 public class Config {
 
     private static final String SCHEMA_REGISTRY_URL = "schema.registry.url";
     private static final String SCHEMA_CACHE_CAPACITY = "schema.cache.capacity";
-    private static final String STREAM_TYPE = "stream.type";
-    private static final String STATELESS = "stateless";
 
     @Bean
     @ConfigurationProperties(prefix = "kafka.streams")
@@ -66,25 +63,15 @@ public class Config {
     }
 
     @Bean
-    public StatelessTopologyBuilder statelessTopologyBuilder() {
-        return new StatelessTopologyBuilder(applicationProperties(), serdeCreator(), new KafkaProducer<>(producerProperties()), schemaRegistryClient());
-    }
-
-    @Bean
-    public StatefulTopologyBuilder statefulTopologyBuilder() {
-        return new StatefulTopologyBuilder(applicationProperties(), serdeCreator(), new KafkaProducer<>(producerProperties()), schemaRegistryClient());
+    public TopologyBuilder topologyBuilder() {
+        return new TopologyBuilder(applicationProperties(), serdeCreator(), new KafkaProducer<>(producerProperties()), schemaRegistryClient());
     }
 
     @Bean
     public StreamsLifecycle streamsLifecycle(ApplicationContext applicationContext) {
 
         Properties applicationProperties = applicationProperties();
-        Topology topology;
-        if (applicationProperties.get(STREAM_TYPE).equals(STATELESS)) {
-            topology = statelessTopologyBuilder().build(applicationProperties);
-        } else {
-            topology = statefulTopologyBuilder().build(applicationProperties);
-        }
+        Topology topology = topologyBuilder().build(applicationProperties);
         return new StreamsLifecycle(topology, applicationProperties, streamsProperties(), applicationContext);
     }
 }

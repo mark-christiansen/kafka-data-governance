@@ -1,4 +1,4 @@
-package com.mycompany.kafka.governance.interceptors;
+package com.mycompany.kafka.governance.interceptors.util;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -10,7 +10,7 @@ import java.util.Map;
 
 public class JsonSerializer<V> implements Serializer<V> {
 
-    private ObjectMapper objectMapper = new ObjectMapper();
+    private final ObjectMapper objectMapper = new ObjectMapper();
 
     @Override
     public void configure(Map<String, ?> configs, boolean isKey) {

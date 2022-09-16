@@ -1,11 +1,10 @@
-package com.mycompany.kafka.streams;
+package com.mycompany.kafka.governance.streams;
 
-import com.mycompany.kafka.streams.common.StreamsLifecycle;
-import com.mycompany.kafka.streams.common.SerdeCreator;
+import com.mycompany.kafka.governance.streams.common.StreamsLifecycle;
+import com.mycompany.kafka.governance.streams.common.SerdeCreator;
 
 import io.confluent.kafka.schemaregistry.client.CachedSchemaRegistryClient;
 import io.confluent.kafka.schemaregistry.client.SchemaRegistryClient;
-import org.apache.kafka.clients.producer.KafkaProducer;
 import org.apache.kafka.streams.Topology;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.ApplicationContext;
@@ -22,8 +21,6 @@ public class Config {
 
     private static final String SCHEMA_REGISTRY_URL = "schema.registry.url";
     private static final String SCHEMA_CACHE_CAPACITY = "schema.cache.capacity";
-    private static final String STREAM_TYPE = "stream.type";
-    private static final String STATELESS = "stateless";
 
     @Bean
     @ConfigurationProperties(prefix = "kafka.streams")
@@ -66,25 +63,15 @@ public class Config {
     }
 
     @Bean
-    public StatelessTopologyBuilder statelessTopologyBuilder() {
-        return new StatelessTopologyBuilder(applicationProperties(), serdeCreator(), new KafkaProducer<>(producerProperties()), schemaRegistryClient());
-    }
-
-    @Bean
-    public StatefulTopologyBuilder statefulTopologyBuilder() {
-        return new StatefulTopologyBuilder(applicationProperties(), serdeCreator(), new KafkaProducer<>(producerProperties()), schemaRegistryClient());
+    public TopologyBuilder topologyBuilder() {
+        return new TopologyBuilder(applicationProperties(), serdeCreator());
     }
 
     @Bean
     public StreamsLifecycle streamsLifecycle(ApplicationContext applicationContext) {
 
         Properties applicationProperties = applicationProperties();
-        Topology topology;
-        if (applicationProperties.get(STREAM_TYPE).equals(STATELESS)) {
-            topology = statelessTopologyBuilder().build(applicationProperties);
-        } else {
-            topology = statefulTopologyBuilder().build(applicationProperties);
-        }
+        Topology topology = topologyBuilder().build(applicationProperties);
         return new StreamsLifecycle(topology, applicationProperties, streamsProperties(), applicationContext);
     }
 }

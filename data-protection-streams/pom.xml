@@ -12,7 +12,7 @@
     </parent>
 
     <version>0.0.1</version>
-    <artifactId>java-kafka-streams</artifactId>
+    <artifactId>kafka-data-protection-streams</artifactId>
     <packaging>jar</packaging>
 
     <organization>
@@ -21,7 +21,7 @@
     </organization>
     <url>https://www.mycompany.com/</url>
     <description>
-        Sample Java Kafka Streams Application
+        Data Protection Streams Application
     </description>
 
     <properties>
@@ -140,7 +140,7 @@
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
                 <configuration>
-                    <mainClass>com.mycompany.kafka.streams.Application</mainClass>
+                    <mainClass>com.mycompany.kafka.governance.streams.Application</mainClass>
                     <layout>JAR</layout>
                     <includeSystemScope>true</includeSystemScope>
                 </configuration>

@@ -3,11 +3,11 @@ package com.mycompany.kafka.governance.interceptors;
 import com.mycompany.kafka.governance.interceptors.rules.FieldValidationRules;
 import com.mycompany.kafka.governance.interceptors.rules.RuleViolation;
 import com.mycompany.kafka.governance.interceptors.util.ClientIdGenerator;
+import com.mycompany.kafka.governance.interceptors.util.JsonSerializer;
 import io.confluent.kafka.schemaregistry.client.CachedSchemaRegistryClient;
 import io.confluent.kafka.schemaregistry.client.SchemaRegistryClient;
 import io.confluent.kafka.serializers.AbstractKafkaSchemaSerDeConfig;
 import io.confluent.kafka.serializers.KafkaAvroDeserializer;
-import io.confluent.kafka.serializers.KafkaAvroSerializer;
 import org.apache.avro.generic.GenericRecord;
 import org.apache.kafka.clients.producer.*;
 import org.apache.kafka.common.errors.SerializationException;
@@ -17,7 +17,6 @@ import org.slf4j.LoggerFactory;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.atomic.AtomicInteger;
 
 @SuppressWarnings("unused")
 public class DataProtectionProducerInterceptor<K, V> implements ProducerInterceptor<K, V> {
