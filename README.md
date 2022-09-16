@@ -53,6 +53,8 @@ the topic `demo.data.violation.monitor`.
 
 ## Data Violations
 
+### Kafka Producer/Consumer Interceptors
+
 The example Kafka applications are configured to send data violations to `demo.data.violation` by using 
 [Consumer Interceptors](https://kafka.apache.org/30/javadoc/org/apache/kafka/clients/consumer/ConsumerInterceptor.html) and
 [Producer Interceptors](https://kafka.apache.org/30/javadoc/org/apache/kafka/clients/producer/ProducerInterceptor.html).
@@ -81,6 +83,8 @@ violation topic. Therefore, in the interceptors an optional conversion of byte a
 effect on throughput and latency, but is the only option for this approach. A more efficient approach would be to
 perform the rules violation check in the streams topology (such as demonstrated in `data-protection-streams`). This is
 very invasive to application code as opposed to consumer and producer interceptors though.
+
+### Independent Monitoring Application
 
 Another approach to data violation monitoring is to have independent applications consuming data from topics and 
 reporting any data violations to a topic. An example of this approach is shown in the  `data-protection-streams` 
