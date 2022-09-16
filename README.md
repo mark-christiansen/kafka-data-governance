@@ -1,5 +1,4 @@
-# kafka-data-governance
-Kafka Data Governance Application
+# Kafka Data Governance Demo
 
 ## Summary
 
