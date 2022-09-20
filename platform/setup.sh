@@ -2,12 +2,6 @@
 
 START=$SECONDS
 
-# env from user input
-ENVS=("jaeger" "otel-jaeger" "dynatrace" "otel-dynatrace")
-[[ -z "$1" ]] && { echo "Environment (${ENVS[@]}) not specified" ; exit 1; }
-[[ ! " ${ENVS[@]} " =~ " $1 " ]] && { echo "Invalid environment $1 specified. Valid envs are (${ENVS[@]})." ; exit 1; }
-ENV=$1
-
 # cleanup volumes
 echo ""
 echo "******************************************************************"
@@ -22,7 +16,7 @@ echo "******************************************************************"
 echo "Starting docker containers"
 echo "******************************************************************"
 echo ""
-docker-compose -f $ENV.yml up -d
+docker-compose up -d
 
 DURATION=$(( SECONDS - START ))
 echo ""
