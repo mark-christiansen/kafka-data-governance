@@ -28,7 +28,7 @@ producer:
   bootstrap.servers: ${BOOTSTRAP_URL}
   security.protocol: ${SECURITY_PROTOCOL:PLAINTEXT}
   schema.registry.url: ${SCHEMA_REGISTRY_URL}
-  interceptor.classes: com.mycompany.kafka.governance.interceptors.DataProtectionProducerInterceptor
+  interceptor.classes: com.mycompany.kafka.governance.data.protection.interceptors.DataProtectionProducerInterceptor
 
 admin:
   bootstrap.servers: ${BOOTSTRAP_URL}

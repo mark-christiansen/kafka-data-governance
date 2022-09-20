@@ -4,19 +4,33 @@ server.port: ${PORT:8080}
 application:
   input.topic: ${INPUT_TOPIC}
   output.topic: ${OUTPUT_TOPIC}
-  failure.output.topic: ${ERROR_TOPIC}
-  state.store.cleanup: ${STATE_STORE_CLEANUP:false}
-  in.memory.state.stores: ${IN_MEMORY_STATE:true}
-  stream.type: ${STREAM_TYPE:stateless}
+  rules.topic: ${RULES_TOPIC}
 
 # Kafka Streams related properties
 kafka:
-  producer:
-    application.id: ${APP_ID}-errors
+  admin:
     bootstrap.servers: ${BOOTSTRAP_URL}
-    security.protocol:  ${SECURITY_PROTOCOL:PLAINTEXT}
-    key.serializer: org.apache.kafka.common.serialization.LongSerializer
-    value.serializer: io.confluent.kafka.serializers.KafkaAvroSerializer
+    security.protocol: ${SECURITY_PROTOCOL:PLAINTEXT}
+    schema.registry.url: ${SCHEMA_REGISTRY_URL}
+  consumer:
+    client.id: ${APP_ID}-rules-consumer
+    group.id: ${GROUP_ID}-rules-consumer
+    # increase for higher throughput
+    max.poll.records: 500
+    # prevent out of order messages when not using an idempotent producer
+    max.in.flight.requests.per.connection: 1
+    # higher for more throughput, 1 for less latency
+    fetch.min.bytes: 1
+    # reduce for lower latency
+    fetch.max.wait.ms: 500
+    # manually commit for high durability
+    enable.auto.commit: false
+    # avoid soft failures due to network latency
+    session.timeout.ms: 30000
+    key.deserializer: org.apache.kafka.common.serialization.StringDeserializer
+    value.deserializer: org.apache.kafka.common.serialization.ByteArrayDeserializer
+    bootstrap.servers: ${BOOTSTRAP_URL}
+    security.protocol: ${SECURITY_PROTOCOL:PLAINTEXT}
     schema.registry.url: ${SCHEMA_REGISTRY_URL}
   streams:
     application.id: ${APP_ID}
@@ -45,10 +59,6 @@ kafka:
     num.stream.threads: 1
     poll.ms: 100
     cache.max.bytes.buffering: 10485760
-    # state store configuration
-    state.dir: ${STATE_DIR:/tmp/kstreams}
-    num.standby.replicas: 0
-    min.insync.replicas: 0
     # schema registry configuration
     schema.registry.url: ${SCHEMA_REGISTRY_URL}
     schema.registry.auth: false
@@ -59,5 +69,3 @@ kafka:
     auto.register.schemas: true
     use.latest.version: true
     latest.compatibility.strict: false
-    producer.interceptor.classes: com.mycompany.kafka.governance.data.protection.interceptors.DataProtectionProducerInterceptor
-    consumer.interceptor.classes: com.mycompany.kafka.governance.data.protection.interceptors.DataProtectionConsumerInterceptor
