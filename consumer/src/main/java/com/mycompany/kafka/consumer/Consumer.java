@@ -32,11 +32,11 @@ public class Consumer {
     private final long pollTimeoutSecs;
     private final Conversions.DecimalConversion decimalConversion = new Conversions.DecimalConversion();
 
-    public Consumer(KafkaConsumer<Long, GenericRecord> consumer, Properties appProperties) {
+    public Consumer(KafkaConsumer<Long, GenericRecord> consumer, Properties applicationProperties) {
         this.consumer = consumer;
-        topicName = appProperties.getProperty(TOPIC);
-        dayOffset = Long.parseLong(appProperties.getProperty(DAY_OFFSET));
-        pollTimeoutSecs = Long.parseLong(appProperties.getProperty(POLL_TIMEOUT_SECS));
+        topicName = applicationProperties.getProperty(TOPIC);
+        dayOffset = Long.parseLong(applicationProperties.getProperty(DAY_OFFSET));
+        pollTimeoutSecs = Long.parseLong(applicationProperties.getProperty(POLL_TIMEOUT_SECS));
     }
 
     public void start() {

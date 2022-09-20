@@ -12,14 +12,14 @@ import java.util.Properties;
 public class Config {
 
     @Bean
-    @ConfigurationProperties(prefix = "consumer")
+    @ConfigurationProperties(prefix = "kafka.consumer")
     public Properties kafkaProperties() {
         return new Properties();
     }
 
     @Bean
-    @ConfigurationProperties(prefix = "app")
-    public Properties appProperties() {
+    @ConfigurationProperties(prefix = "application")
+    public Properties applicationProperties() {
         return new Properties();
     }
 

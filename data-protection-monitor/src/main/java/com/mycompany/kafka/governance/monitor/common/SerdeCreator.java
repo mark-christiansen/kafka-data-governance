@@ -1,14 +1,11 @@
-package com.mycompany.kafka.governance.streams.common;
+package com.mycompany.kafka.governance.monitor.common;
 
 import io.confluent.kafka.schemaregistry.client.SchemaRegistryClient;
 import io.confluent.kafka.serializers.AbstractKafkaSchemaSerDeConfig;
 import io.confluent.kafka.serializers.KafkaAvroDeserializerConfig;
 import io.confluent.kafka.streams.serdes.avro.GenericAvroSerde;
 import org.apache.avro.generic.GenericRecord;
-import org.apache.kafka.clients.consumer.ConsumerConfig;
-import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.common.serialization.Serde;
-import org.apache.kafka.streams.StreamsConfig;
 
 import java.util.HashMap;
 import java.util.Map;

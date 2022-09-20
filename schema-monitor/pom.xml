@@ -12,7 +12,7 @@
     </parent>
 
     <version>0.0.1</version>
-    <artifactId>data-protection-monitor</artifactId>
+    <artifactId>schema-monitor</artifactId>
     <packaging>jar</packaging>
 
     <organization>
@@ -21,10 +21,11 @@
     </organization>
     <url>https://www.mycompany.com/</url>
     <description>
-        Data Protection Monitor Application
+        Schema Registry Monitor Application
     </description>
 
     <properties>
+        <zjsonpatch.version>0.2.1</zjsonpatch.version>
         <docker.buildArg.JAR_FILE>target/${project.artifactId}-${project.version}.jar</docker.buildArg.JAR_FILE>
         <docker.buildArg.JAVA_AGENT_URL>https://github.com/open-telemetry/opentelemetry-java-instrumentation/releases/download/v1.17.0/opentelemetry-javaagent.jar</docker.buildArg.JAVA_AGENT_URL>
     </properties>
@@ -42,12 +43,6 @@
     </dependencyManagement>
 
     <dependencies>
-        <!-- mycompany -->
-        <dependency>
-            <groupId>com.mycompany</groupId>
-            <artifactId>kafka-data-protection</artifactId>
-            <version>${project.version}</version>
-        </dependency>
         <!-- spring -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -97,6 +92,11 @@
         </dependency>
         <!-- other -->
         <dependency>
+            <groupId>com.flipkart.zjsonpatch</groupId>
+            <artifactId>zjsonpatch</artifactId>
+            <version>${zjsonpatch.version}</version>
+        </dependency>
+        <dependency>
             <groupId>ch.qos.logback</groupId>
             <artifactId>logback-core</artifactId>
             <version>${logback.version}</version>
@@ -140,7 +140,7 @@
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
                 <configuration>
-                    <mainClass>com.mycompany.kafka.governance.monitor.Application</mainClass>
+                    <mainClass>com.mycompany.kafka.schema.monitor.Application</mainClass>
                     <layout>JAR</layout>
                     <includeSystemScope>true</includeSystemScope>
                 </configuration>

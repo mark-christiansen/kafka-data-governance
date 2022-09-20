@@ -64,7 +64,8 @@
     <modules>
         <module>data-protection/pom.xml</module>
         <module>data-protection-agent/pom.xml</module>
-        <module>data-protection-streams/pom.xml</module>
+        <module>data-protection-monitor/pom.xml</module>
+        <module>schema-monitor/pom.xml</module>
         <module>producer/pom.xml</module>
         <module>streams/pom.xml</module>
         <module>consumer/pom.xml</module>

@@ -1,20 +1,14 @@
-package com.mycompany.kafka.governance.streams;
-
-import com.mycompany.kafka.governance.data.protection.rules.FieldValidationRules;
-import com.mycompany.kafka.governance.streams.common.StreamsLifecycle;
-import com.mycompany.kafka.governance.streams.common.SerdeCreator;
+package com.mycompany.kafka.schema.monitor;
 
 import io.confluent.kafka.schemaregistry.client.CachedSchemaRegistryClient;
 import io.confluent.kafka.schemaregistry.client.SchemaRegistryClient;
 import org.apache.kafka.clients.admin.AdminClient;
 import org.apache.kafka.clients.consumer.KafkaConsumer;
-import org.apache.kafka.streams.Topology;
+import org.apache.kafka.clients.producer.KafkaProducer;
 import org.springframework.boot.context.properties.ConfigurationProperties;
-import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-import java.beans.BeanProperty;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
@@ -45,15 +39,15 @@ public class Config {
     }
 
     @Bean
-    @ConfigurationProperties(prefix = "kafka.streams")
-    public Properties streamsProperties() {
+    @ConfigurationProperties(prefix = "kafka.producer")
+    public Properties producerProperties() {
         return new Properties();
     }
 
     @Bean
     public SchemaRegistryClient schemaRegistryClient() {
 
-        Properties kafkaProperties = streamsProperties();
+        Properties kafkaProperties = consumerProperties();
 
         // pull out schema registry properties from kafka properties to pass to schema registry client
         Map<String, Object> schemaProperties = new HashMap<>();
@@ -68,36 +62,17 @@ public class Config {
     }
 
     @Bean
-    public SerdeCreator serdeCreator() {
-        return new SerdeCreator(streamsProperties(), schemaRegistryClient());
+    public AdminClient adminClient() {
+        return AdminClient.create(adminProperties());
     }
 
     @Bean
-    public FieldValidationRules fieldValidationRules() {
-        return new FieldValidationRules();
-    }
-
-    @Bean
-    public TopologyBuilder topologyBuilder() {
-        return new TopologyBuilder(applicationProperties(), serdeCreator(), fieldValidationRules());
-    }
-
-    @Bean
-    public StreamsLifecycle streamsLifecycle(ApplicationContext applicationContext) {
-
-        Properties applicationProperties = applicationProperties();
-        Topology topology = topologyBuilder().build(applicationProperties);
-        return new StreamsLifecycle(topology, applicationProperties, streamsProperties(), applicationContext,
-                fieldValidationRules(), kafkaConsumer(), adminClient());
-    }
-
-    @Bean
-    public KafkaConsumer<String, byte[]> kafkaConsumer() {
+    public KafkaConsumer<String, String> kafkaConsumer() {
         return new KafkaConsumer<>(consumerProperties());
     }
 
     @Bean
-    public AdminClient adminClient() {
-        return AdminClient.create(adminProperties());
+    public KafkaProducer<String, String> kafkaProducer() {
+        return new KafkaProducer<>(producerProperties());
     }
 }

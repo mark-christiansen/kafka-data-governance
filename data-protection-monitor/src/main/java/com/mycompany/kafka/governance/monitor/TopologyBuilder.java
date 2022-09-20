@@ -1,11 +1,11 @@
-package com.mycompany.kafka.governance.streams;
+package com.mycompany.kafka.governance.monitor;
 
 import com.mycompany.kafka.governance.data.protection.ConsumerRuleViolation;
 import com.mycompany.kafka.governance.data.protection.rules.FieldValidationRules;
 import com.mycompany.kafka.governance.data.protection.RuleViolation;
 import com.mycompany.kafka.governance.data.protection.util.JsonDeserializer;
 import com.mycompany.kafka.governance.data.protection.util.JsonSerializer;
-import com.mycompany.kafka.governance.streams.common.SerdeCreator;
+import com.mycompany.kafka.governance.monitor.common.SerdeCreator;
 
 import org.apache.avro.generic.GenericRecord;
 import org.apache.kafka.clients.consumer.ConsumerConfig;

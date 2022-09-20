@@ -1,4 +1,4 @@
-package com.mycompany.kafka.governance.streams.common;
+package com.mycompany.kafka.governance.monitor.common;
 
 import org.springframework.boot.actuate.health.Health;
 import org.springframework.boot.actuate.health.ReactiveHealthIndicator;

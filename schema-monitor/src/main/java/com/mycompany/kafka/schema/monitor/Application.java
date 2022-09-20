@@ -1,9 +1,7 @@
-package com.mycompany.kafka.producer;
+package com.mycompany.kafka.schema.monitor;
 
-import org.apache.avro.generic.GenericRecord;
 import org.apache.kafka.clients.admin.AdminClient;
 import org.apache.kafka.clients.admin.NewTopic;
-import org.apache.kafka.clients.producer.KafkaProducer;
 import org.apache.kafka.common.errors.TopicExistsException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
@@ -18,29 +16,24 @@ import java.util.concurrent.ExecutionException;
 @SpringBootApplication
 public class Application implements CommandLineRunner {
 
-    private static final String TOPIC = "topic";
-    private static final String PARTITIONS = "partitions";
+    private static final String TOPIC = "schema.audit.topic";
+    private static final String PARTITIONS = "schema.audit.partitions";
 
-    @Autowired
-    private KafkaProducer<Long, GenericRecord> kafkaProducer;
     @Autowired
     private AdminClient adminClient;
     @Autowired
     private Properties applicationProperties;
 
     public static void main(String[] args) {
-        SpringApplication.run(Application.class, args).close();
+        SpringApplication.run(Application.class, args);
     }
 
     @Override
-    public void run(String... args) throws Exception {
+    public void run(String... args) {
 
         String topicName = applicationProperties.getProperty(TOPIC);
         int partitions = Integer.parseInt(applicationProperties.getProperty(PARTITIONS));
         createTopic(topicName, partitions);
-
-        GenericRecordProducer genericRecordProducer = new GenericRecordProducer(kafkaProducer, applicationProperties);
-        genericRecordProducer.start();
     }
 
     private void createTopic(String topicName, int partitions) {
@@ -55,5 +48,4 @@ public class Application implements CommandLineRunner {
             }
         }
     }
-
 }

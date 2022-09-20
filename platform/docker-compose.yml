@@ -144,6 +144,8 @@ services:
       - bash
       - -c
       - |
+        cd /scripts/ops
+        ./populate-rules.sh demo.data.violation.rules
         touch /tmp/initialized
         tail -f /dev/null
     volumes:
@@ -266,10 +268,10 @@ services:
       timeout: 10s
       retries: 20
 
-  monitor1:
-    image: com.mycompany/data-protection-streams:0.0.1
-    hostname: monitor1
-    container_name: monitor1
+  datamonitor:
+    image: com.mycompany/data-protection-monitor:0.0.1
+    hostname: datamonitor
+    container_name: datamonitor
     links:
       - consumer1
     depends_on:
@@ -278,13 +280,13 @@ services:
     ports:
       - "9003:9003"
     environment:
-      APP_ID: monitor1
-      GROUP_ID: monitor1
+      APP_ID: datamonitor
+      GROUP_ID: datamonitor
       BOOTSTRAP_URL: kafka1.${DOMAIN}:29092
       SECURITY_PROTOCOL: PLAINTEXT
       SCHEMA_REGISTRY_URL: http://schema1.${DOMAIN}:8081
-      INPUT_TOPIC: ^demo\.((?!data\.violation).)*$
-      OUTPUT_TOPIC: demo.data.violation.inprocess.asynch
+      INPUT_TOPIC: ^demo\.((?!data\.violation).)*$$
+      OUTPUT_TOPIC: demo.data.violation.asynch
       RULES_TOPIC: demo.data.violation.rules
       PORT: 9003
       JAVA_OPTS: >-
@@ -292,7 +294,37 @@ services:
     networks:
       - kafka-network
     healthcheck:
-      test: ["CMD", "bash", "-c", "curl http://momitor1.${DOMAIN}:9003/actuator/health | grep -e '\"status\":\"UP\"'"]
+      test: ["CMD", "bash", "-c", "curl http://datamonitor.${DOMAIN}:9003/actuator/health | grep -e '\"status\":\"UP\"'"]
+      interval: 10s
+      timeout: 10s
+      retries: 20
+
+  schemamonitor:
+    image: com.mycompany/schema-monitor:0.0.1
+    hostname: schemamonitor
+    container_name: schemamonitor
+    links:
+      - consumer1
+    depends_on:
+      consumer1:
+        condition: service_healthy
+    ports:
+      - "9004:9004"
+    environment:
+      APP_ID: schemamonitor
+      GROUP_ID: schemamonitor
+      BOOTSTRAP_URL: kafka1.${DOMAIN}:29092
+      SECURITY_PROTOCOL: PLAINTEXT
+      SCHEMA_REGISTRY_URL: http://schema1.${DOMAIN}:8081
+      SCHEMAS_TOPIC: _schemas
+      SCHEMA_AUDIT_TOPIC: demo.data.violation.schemas
+      PORT: 9004
+      JAVA_OPTS: >-
+        -Xms1G -Xmx1G
+    networks:
+      - kafka-network
+    healthcheck:
+      test: ["CMD", "bash", "-c", "curl http://schemamonitor.${DOMAIN}:9003/actuator/health | grep -e '\"status\":\"UP\"'"]
       interval: 10s
       timeout: 10s
       retries: 20

@@ -1,4 +1,4 @@
-package com.mycompany.kafka.governance.streams.common;
+package com.mycompany.kafka.governance.monitor.common;
 
 import com.mycompany.kafka.governance.data.protection.rules.FieldValidationRuleUpdater;
 import com.mycompany.kafka.governance.data.protection.rules.FieldValidationRules;

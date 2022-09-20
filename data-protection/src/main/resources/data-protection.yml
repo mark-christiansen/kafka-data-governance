@@ -1,7 +1,7 @@
 rules:
   - record: "com.mycompany.kafka.model.Customer"
     field: "creditCardNumber"
-    type: "pattern-matching"
+    type: "pattern-match"
     regex: "^4[0-9]{12}(?:[0-9]{3})?$"
   - record: "com.mycompany.kafka.model.Customer"
     field: "firstName"

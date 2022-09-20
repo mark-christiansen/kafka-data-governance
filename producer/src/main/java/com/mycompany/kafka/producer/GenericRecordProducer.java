@@ -29,13 +29,13 @@ public class GenericRecordProducer {
     private final int batchSize;
     private final long frequencyMs;
 
-    public GenericRecordProducer(KafkaProducer<Long, GenericRecord> producer, Properties appProperties) {
+    public GenericRecordProducer(KafkaProducer<Long, GenericRecord> producer, Properties applicationProperties) {
         this.producer = producer;
-        topicName = appProperties.getProperty(TOPIC);
-        messages = Long.parseLong(appProperties.getProperty(MESSAGES));
-        schemaName = appProperties.getProperty(SCHEMA);
-        batchSize = Integer.parseInt(appProperties.getProperty(BATCH_SIZE));
-        frequencyMs = Long.parseLong(appProperties.getProperty(FREQUENCY_MS));
+        topicName = applicationProperties.getProperty(TOPIC);
+        messages = Long.parseLong(applicationProperties.getProperty(MESSAGES));
+        schemaName = applicationProperties.getProperty(SCHEMA);
+        batchSize = Integer.parseInt(applicationProperties.getProperty(BATCH_SIZE));
+        frequencyMs = Long.parseLong(applicationProperties.getProperty(FREQUENCY_MS));
     }
 
     public void start() throws IOException {

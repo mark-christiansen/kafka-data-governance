@@ -17,20 +17,20 @@ public class Config {
     private static final Logger log = LoggerFactory.getLogger(Config.class);
 
     @Bean
-    @ConfigurationProperties(prefix = "producer")
+    @ConfigurationProperties(prefix = "kafka.producer")
     public Properties producerProperties() {
         return new Properties();
     }
 
     @Bean
-    @ConfigurationProperties(prefix = "admin")
+    @ConfigurationProperties(prefix = "kafka.admin")
     public Properties adminProperties() {
         return new Properties();
     }
 
     @Bean
-    @ConfigurationProperties(prefix = "app")
-    public Properties appProperties() {
+    @ConfigurationProperties(prefix = "application")
+    public Properties applicationProperties() {
         return new Properties();
     }
 
