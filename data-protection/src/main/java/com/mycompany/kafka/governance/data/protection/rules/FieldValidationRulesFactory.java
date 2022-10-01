@@ -14,6 +14,7 @@ public class FieldValidationRulesFactory {
     private static final String TYPE = "type";
     private static final String PATTERN_MATCH_TYPE = "pattern-match";
     private static final String PROPER_NAME_MATCH_TYPE = "proper-name-match";
+    private static final String COMPRESSION_RATE_TYPE = "compression-rate";
     private static final String REGEX = "regex";
 
     public static FieldValidationRules create() {
@@ -38,6 +39,8 @@ public class FieldValidationRulesFactory {
             return new PatternMatchRule(recordName, props.get(FIELD), props.get(REGEX));
         } else if (PROPER_NAME_MATCH_TYPE.equals(type)) {
             return new ProperNameMatchRule(recordName, props.get(FIELD));
+        } else if (COMPRESSION_RATE_TYPE.equals(type)) {
+            return new CompressionRateRule(recordName, props.get(FIELD));
         } else {
             throw new UnsupportedOperationException("The rule type \"" + type + "\" is not supported");
         }

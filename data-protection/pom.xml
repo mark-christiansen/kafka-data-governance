@@ -28,6 +28,7 @@
         <snakeyaml.version>1.32</snakeyaml.version>
         <jackson.version>2.13.4</jackson.version>
         <opennlp.version>2.0.0</opennlp.version>
+        <passay.version>1.6.2</passay.version>
     </properties>
 
     <dependencies>
@@ -64,6 +65,11 @@
             <version>${opennlp.version}</version>
         </dependency>
         <dependency>
+            <groupId>org.passay</groupId>
+            <artifactId>passay</artifactId>
+            <version>${passay.version}</version>
+        </dependency>
+        <dependency>
             <groupId>ch.qos.logback</groupId>
             <artifactId>logback-core</artifactId>
             <version>${logback.version}</version>
@@ -77,7 +83,6 @@
             <groupId>org.lz4</groupId>
             <artifactId>lz4-java</artifactId>
             <version>${lz4.version}</version>
-            <scope>runtime</scope>
         </dependency>
 
         <!-- Test dependencies -->

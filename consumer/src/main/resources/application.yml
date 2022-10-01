@@ -29,4 +29,3 @@ kafka:
     bootstrap.servers: ${BOOTSTRAP_URL}
     security.protocol: ${SECURITY_PROTOCOL:PLAINTEXT}
     schema.registry.url: ${SCHEMA_REGISTRY_URL}
-    interceptor.classes: com.mycompany.kafka.governance.data.protection.interceptors.DataProtectionConsumerInterceptor

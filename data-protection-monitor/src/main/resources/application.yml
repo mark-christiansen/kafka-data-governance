@@ -16,13 +16,13 @@ kafka:
     client.id: ${APP_ID}-rules-consumer
     group.id: ${GROUP_ID}-rules-consumer
     # increase for higher throughput
-    max.poll.records: 500
+    max.poll.records: ${MAX_POLL_RECORDS:500}
     # prevent out of order messages when not using an idempotent producer
     max.in.flight.requests.per.connection: 1
     # higher for more throughput, 1 for less latency
-    fetch.min.bytes: 1
+    fetch.min.bytes: ${FETCH_MIN_BYTES:1}
     # reduce for lower latency
-    fetch.max.wait.ms: 500
+    fetch.max.wait.ms: ${FETCH_MAX_WAIT_MS:500}
     # manually commit for high durability
     enable.auto.commit: false
     # avoid soft failures due to network latency

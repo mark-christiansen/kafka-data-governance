@@ -59,5 +59,3 @@ kafka:
     auto.register.schemas: true
     use.latest.version: true
     latest.compatibility.strict: false
-    producer.interceptor.classes: com.mycompany.kafka.governance.data.protection.interceptors.DataProtectionProducerInterceptor
-    consumer.interceptor.classes: com.mycompany.kafka.governance.data.protection.interceptors.DataProtectionConsumerInterceptor

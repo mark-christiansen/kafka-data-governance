@@ -2,13 +2,19 @@
 
 START=$SECONDS
 
+# env from user input
+ENVS=("single-collector" "multiple-collectors")
+[[ -z "$1" ]] && { echo "Environment (${ENVS[@]}) not specified" ; exit 1; }
+[[ ! " ${ENVS[@]} " =~ " $1 " ]] && { echo "Invalid environment $1 specified. Valid envs are (${ENVS[@]})." ; exit 1; }
+ENV=$1
+
 # launch docker containers
 echo ""
 echo "******************************************************************"
 echo "Stopping docker containers"
 echo "******************************************************************"
 echo ""
-docker-compose down
+docker-compose -f ${ENV}.yml down
 
 # cleanup volumes
 echo ""

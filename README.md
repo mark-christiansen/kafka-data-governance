@@ -33,6 +33,20 @@ is running. To build the project, go to the base directory and run `mvn install`
 create bootable jar files for each. Then it will generate `docker` images for each and push them to your local repo. The 
 `Dockerfile` for each project is located in the base directory for each module.
 
+To deploy the docker images to a remote repository, update the `docker.registry` and `docker.image.registry` in the base
+`pom.xml` of this project. The `docker.registry` is the URl of the remote repository and the `docker.image.registry` is
+the first part of the docker image names for your company (`<registry>/<image-name>:<version`).
+```
+    <properties>
+        ...
+        <docker.registry>https://index.docker.io/v1/</docker.registry>
+        <docker.image.registry>com.mycompany</docker.image.registry>
+    </properties>
+```
+Then go to the base directory and run `mvn deploy -Ddocker.username=<username> -Ddocker.password=<password>`. This will
+deploy your docker images to the docker registry specified by `docker.registry` as both `linux/amd64` and `linux/arm64`
+architectures.
+
 ## Setup Project
 
 Now that the Kafka clients are built and have `docker` images in your local repo, you can run an them all

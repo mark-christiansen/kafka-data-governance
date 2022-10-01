@@ -97,7 +97,7 @@ public class SchemaRegistryMonitor {
                         try {
 
                             String subject = schema.getSubject();
-                            int version = schema.getVersion();;
+                            int version = schema.getVersion();
                             SchemaMetadata latestSchema = schemaState.getSchema(subject);
 
                             String jsonDiff = null;

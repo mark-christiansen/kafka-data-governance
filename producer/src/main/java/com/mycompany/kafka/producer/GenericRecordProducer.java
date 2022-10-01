@@ -21,6 +21,8 @@ public class GenericRecordProducer {
     private static final String MESSAGES = "messages";
     private static final String BATCH_SIZE = "batch.size";
     private static final String FREQUENCY_MS = "frequency.ms";
+    private static final String ENCRYPT_FIELDS = "encrypt.fields";
+    private static final String ENCODE_FIELDS = "encode.fields";
 
     private final KafkaProducer<Long, GenericRecord> producer;
     private final String topicName;
@@ -28,6 +30,8 @@ public class GenericRecordProducer {
     private final String schemaName;
     private final int batchSize;
     private final long frequencyMs;
+    private final Set<String> encryptFields = new HashSet<>();
+    private final Set<String> encodeFields = new HashSet<>();
 
     public GenericRecordProducer(KafkaProducer<Long, GenericRecord> producer, Properties applicationProperties) {
         this.producer = producer;
@@ -36,6 +40,14 @@ public class GenericRecordProducer {
         schemaName = applicationProperties.getProperty(SCHEMA);
         batchSize = Integer.parseInt(applicationProperties.getProperty(BATCH_SIZE));
         frequencyMs = Long.parseLong(applicationProperties.getProperty(FREQUENCY_MS));
+        if (applicationProperties.getProperty(ENCRYPT_FIELDS) != null &&
+                !"".equals(applicationProperties.getProperty(ENCRYPT_FIELDS).trim())) {
+            encryptFields.addAll(Arrays.asList(applicationProperties.getProperty(ENCRYPT_FIELDS).split(",")));
+        }
+        if (applicationProperties.getProperty(ENCODE_FIELDS) != null &&
+                !"".equals(applicationProperties.getProperty(ENCODE_FIELDS).trim())) {
+            encodeFields.addAll(Arrays.asList(applicationProperties.getProperty(ENCODE_FIELDS).split(",")));
+        }
     }
 
     public void start() throws IOException {
@@ -57,6 +69,8 @@ public class GenericRecordProducer {
                 long currentBatch = count + batchSize < messages ? batchSize : messages - count;
                 List<GenericRecord> records = convert(schema, dataGenerator.generate(schema, (int) currentBatch));
                 for (GenericRecord record : records) {
+                    //encryptFields(record);
+                    //encodeFields(record);
                     producer.send(new ProducerRecord<>(topicName, (Long) record.get("id"), record));
                 }
                 producer.flush();
@@ -87,5 +101,35 @@ public class GenericRecordProducer {
             records.add(recordBuilder.build());
         }
         return records;
+    }
+
+    private void encryptFields(GenericRecord record) {
+        if (!encryptFields.isEmpty()) {
+
+            Schema schema  = record.getSchema();
+            for(String fieldName : encryptFields) {
+
+                Object fieldValue = record.get(fieldName);
+                Schema.Field field = schema.getField(fieldName);
+                Schema fieldSchema = field.schema();
+                if (Schema.Type.UNION.equals(fieldSchema.getType())) {
+                    System.out.println(fieldSchema.getType());
+                }
+                System.out.println(field);
+            }
+        }
+    }
+
+    private void encodeFields(GenericRecord record) {
+        if (!encodeFields.isEmpty()) {
+
+            Schema schema  = record.getSchema();
+            for(String fieldName : encodeFields) {
+
+                Object fieldValue = record.get(fieldName);
+                Schema.Field field = schema.getField(fieldName);
+                System.out.println(field);
+            }
+        }
     }
 }

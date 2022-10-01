@@ -75,9 +75,6 @@ services:
       # logging
       KAFKA_LOG4J_ROOT_LOGLEVEL: INFO
       KAFKA_LOG4J_LOGGERS: kafka.authorizer.logger=INFO
-      #KAFKA_OPTS: '-Djavax.net.debug=ssl'
-      #KAFKA_JMX_PORT: 9010
-      #KAFKA_JMX_HOSTNAME: localhost
       KAFKA_HEAP_OPTS: "-Xms${BROKER_HEAP} -Xmx${BROKER_HEAP}"
     volumes:
       - ./volumes/kafka-1:/var/lib/kafka/data
@@ -128,41 +125,10 @@ services:
       timeout: 10s
       retries: 20
 
-################## CLIENT ##################
-
-  client:
-    image: kafka-client:0.0.1
-    build: ./client
-    hostname: client.${DOMAIN}
-    container_name: client
-    links:
-      - schema1
-    depends_on:
-      schema1:
-        condition: service_healthy
-    command:
-      - bash
-      - -c
-      - |
-        cd /scripts/ops
-        ./populate-rules.sh demo.data.violation.rules
-        touch /tmp/initialized
-        tail -f /dev/null
-    volumes:
-      - ./client/scripts:/scripts:ro
-    networks:
-      - kafka-network
-    healthcheck:
-      test: ["CMD", "bash", "-c", "find /tmp/initialized"]
-      start_period: 60s
-      interval: 15s
-      timeout: 15s
-      retries: 30
-
 ################## APPS ##################
 
   producer1:
-    image: com.mycompany/java-kafka-producer:0.0.1
+    image: ${REGISTRY}/java-kafka-producer:0.0.1
     hostname: producer1
     container_name: producer1
     links:
@@ -177,17 +143,14 @@ services:
       BOOTSTRAP_URL: kafka1.${DOMAIN}:29092
       SECURITY_PROTOCOL: PLAINTEXT
       SCHEMA_REGISTRY_URL: http://schema1.${DOMAIN}:8081
-      TOPIC: demo.customer
+      TOPIC: demo.customer1
       SCHEMA: customer
       PARTITIONS: 5
-      MESSAGES: 10000
-      BATCH_SIZE: 1
-      FREQUENCY_MS: 1000
+      MESSAGES: 100000
+      BATCH_SIZE: 100
+      FREQUENCY_MS: 500
       PORT: 9000
-      DATA_PROTECTION_VIOLATION_TOPIC_NAME: demo.data.violation.synch
-      INTERCEPTORS: com.mycompany.kafka.governance.data.protection.interceptors.DataProtectionConsumerInterceptor
-      JAVA_OPTS: >-
-        -Xms1G -Xmx1G
+      JAVA_OPTS: -Xms300M -Xmx300M
     networks:
       - kafka-network
     healthcheck:
@@ -196,120 +159,258 @@ services:
       timeout: 10s
       retries: 20
 
-  kstream1:
-    image: com.mycompany/java-kafka-streams:0.0.1
-    hostname: kstream1
-    container_name: kstream1
+  producer2:
+    image: ${REGISTRY}/java-kafka-producer:0.0.1
+    hostname: producer2
+    container_name: producer2
     links:
-      - producer1
+      - schema1
     depends_on:
-      producer1:
+      schema1:
         condition: service_healthy
     ports:
       - "9001:9001"
     environment:
-      APP_ID: kstream1
-      GROUP_ID: kstream1
+      CLIENT_ID: producer2
       BOOTSTRAP_URL: kafka1.${DOMAIN}:29092
       SECURITY_PROTOCOL: PLAINTEXT
       SCHEMA_REGISTRY_URL: http://schema1.${DOMAIN}:8081
-      INPUT_TOPIC: demo.customer
-      OUTPUT_TOPIC: demo.transform.customer
-      ERROR_TOPIC: demo.errors
-      STATE_STORE_CLEANUP: false
-      IN_MEMORY_STATE: false
-      STREAM_TYPE: stateless
-      STATE_DIR: /data
+      TOPIC: demo.customer2
+      SCHEMA: customer
+      PARTITIONS: 5
+      MESSAGES: 100000
+      BATCH_SIZE: 100
+      FREQUENCY_MS: 500
       PORT: 9001
-      DATA_PROTECTION_VIOLATION_TOPIC_NAME: demo.data.violation.synch
-      INTERCEPTORS: com.mycompany.kafka.governance.data.protection.interceptors.DataProtectionConsumerInterceptor
-      JAVA_OPTS: >-
-        -Xms1G -Xmx1G
-    volumes:
-      - ./volumes/kstreams-1:/data
+      JAVA_OPTS: -Xms300M -Xmx300M
     networks:
       - kafka-network
     healthcheck:
-      test: ["CMD", "bash", "-c", "curl http://kstream1.${DOMAIN}:9001/actuator/health | grep -e '\"status\":\"UP\"'"]
+      test: ["CMD", "bash", "-c", "curl http://producer2.${DOMAIN}:9001/actuator/health | grep -e '\"status\":\"UP\"'"]
       interval: 10s
       timeout: 10s
       retries: 20
 
-  consumer1:
-    image: com.mycompany/java-kafka-consumer:0.0.1
-    hostname: consumer1
-    container_name: consumer1
+  producer3:
+    image: ${REGISTRY}/java-kafka-producer:0.0.1
+    hostname: producer3
+    container_name: producer3
     links:
-      - kstream1
+      - schema1
     depends_on:
-      kstream1:
+      schema1:
         condition: service_healthy
     ports:
       - "9002:9002"
     environment:
-      CLIENT_ID: consumer1
-      GROUP_ID: consumer1
+      CLIENT_ID: producer3
       BOOTSTRAP_URL: kafka1.${DOMAIN}:29092
       SECURITY_PROTOCOL: PLAINTEXT
       SCHEMA_REGISTRY_URL: http://schema1.${DOMAIN}:8081
-      TOPIC: demo.transform.customer
-      OFFSET_DAYS: 0
-      POLL_TIMEOUT_SECS: 30
+      TOPIC: demo.customer3
+      SCHEMA: customer
+      PARTITIONS: 5
+      MESSAGES: 100000
+      BATCH_SIZE: 100
+      FREQUENCY_MS: 500
       PORT: 9002
-      DATA_PROTECTION_VIOLATION_TOPIC_NAME: demo.data.violation.synch
-      INTERCEPTORS: com.mycompany.kafka.governance.data.protection.interceptors.DataProtectionConsumerInterceptor
-      JAVA_OPTS: >-
-        -Xms1G -Xmx1G
+      JAVA_OPTS: -Xms300M -Xmx300M
     networks:
       - kafka-network
     healthcheck:
-      test: ["CMD", "bash", "-c", "curl http://consumer1.${DOMAIN}:9002/actuator/health | grep -e '\"status\":\"UP\"'"]
+      test: ["CMD", "bash", "-c", "curl http://producer3.${DOMAIN}:9002/actuator/health | grep -e '\"status\":\"UP\"'"]
       interval: 10s
       timeout: 10s
       retries: 20
 
-  datamonitor:
-    image: com.mycompany/data-protection-monitor:0.0.1
-    hostname: datamonitor
-    container_name: datamonitor
+  producer4:
+    image: ${REGISTRY}/java-kafka-producer:0.0.1
+    hostname: producer4
+    container_name: producer4
     links:
-      - consumer1
+      - schema1
     depends_on:
-      consumer1:
+      schema1:
         condition: service_healthy
     ports:
       - "9003:9003"
     environment:
-      APP_ID: datamonitor
-      GROUP_ID: datamonitor
+      CLIENT_ID: producer4
       BOOTSTRAP_URL: kafka1.${DOMAIN}:29092
       SECURITY_PROTOCOL: PLAINTEXT
       SCHEMA_REGISTRY_URL: http://schema1.${DOMAIN}:8081
-      INPUT_TOPIC: ^demo\.((?!data\.violation).)*$$
-      OUTPUT_TOPIC: demo.data.violation.asynch
-      RULES_TOPIC: demo.data.violation.rules
+      TOPIC: demo.customer4
+      SCHEMA: customer
+      PARTITIONS: 5
+      MESSAGES: 100000
+      BATCH_SIZE: 100
+      FREQUENCY_MS: 500
       PORT: 9003
+      JAVA_OPTS: -Xms300M -Xmx300M
+    networks:
+      - kafka-network
+    healthcheck:
+      test: ["CMD", "bash", "-c", "curl http://producer4.${DOMAIN}:9003/actuator/health | grep -e '\"status\":\"UP\"'"]
+      interval: 10s
+      timeout: 10s
+      retries: 20
+
+  producer5:
+    image: ${REGISTRY}/java-kafka-producer:0.0.1
+    hostname: producer5
+    container_name: producer5
+    links:
+      - schema1
+    depends_on:
+      schema1:
+        condition: service_healthy
+    ports:
+      - "9004:9004"
+    environment:
+      CLIENT_ID: producer5
+      BOOTSTRAP_URL: kafka1.${DOMAIN}:29092
+      SECURITY_PROTOCOL: PLAINTEXT
+      SCHEMA_REGISTRY_URL: http://schema1.${DOMAIN}:8081
+      TOPIC: demo.customer5
+      SCHEMA: customer
+      PARTITIONS: 5
+      MESSAGES: 100000
+      BATCH_SIZE: 100
+      FREQUENCY_MS: 500
+      PORT: 9004
+      JAVA_OPTS: -Xms300M -Xmx300M
+    networks:
+      - kafka-network
+    healthcheck:
+      test: ["CMD", "bash", "-c", "curl http://producer5.${DOMAIN}:9004/actuator/health | grep -e '\"status\":\"UP\"'"]
+      interval: 10s
+      timeout: 10s
+      retries: 20
+
+  ################## CLIENT ##################
+
+  client:
+    image: kafka-client:0.0.1
+    build: ./client
+    hostname: client.${DOMAIN}
+    container_name: client
+    links:
+      - producer1
+      - producer2
+      - producer3
+      - producer4
+      - producer5
+    depends_on:
+      producer1:
+        condition: service_healthy
+      producer2:
+        condition: service_healthy
+      producer3:
+        condition: service_healthy
+      producer4:
+        condition: service_healthy
+      producer5:
+        condition: service_healthy
+    command:
+      - bash
+      - -c
+      - |
+        cd /scripts/ops
+        ./populate-rules.sh demo.governance.rules
+        touch /tmp/initialized
+        tail -f /dev/null
+    volumes:
+      - ./client/scripts:/scripts:ro
+    networks:
+      - kafka-network
+    healthcheck:
+      test: ["CMD", "bash", "-c", "find /tmp/initialized"]
+      start_period: 60s
+      interval: 15s
+      timeout: 15s
+      retries: 30
+
+################## MONITORS ##################
+
+  datamonitor1:
+    image: ${REGISTRY}/data-protection-monitor:0.0.1
+    hostname: datamonitor1
+    container_name: datamonitor1
+    links:
+      - client
+    depends_on:
+      client:
+        condition: service_healthy
+    ports:
+      - "9100:9100"
+    environment:
+      APP_ID: datamonitor
+      GROUP_ID: datamonitor
+      MAX_POLL_RECORDS: 500
+      FETCH_MIN_BYTES: 100000
+      FETCH_MAX_WAIT_MS: 500
+      BOOTSTRAP_URL: kafka1.${DOMAIN}:29092
+      SECURITY_PROTOCOL: PLAINTEXT
+      SCHEMA_REGISTRY_URL: http://schema1.${DOMAIN}:8081
+      INPUT_TOPIC: ^demo\.((?!governance).)*$$
+      OUTPUT_TOPIC: demo.governance.alerts
+      RULES_TOPIC: demo.governance.rules
+      PORT: 9100
       JAVA_OPTS: >-
         -Xms1G -Xmx1G
     networks:
       - kafka-network
     healthcheck:
-      test: ["CMD", "bash", "-c", "curl http://datamonitor.${DOMAIN}:9003/actuator/health | grep -e '\"status\":\"UP\"'"]
+      test: ["CMD", "bash", "-c", "curl http://datamonitor1.${DOMAIN}:9100/actuator/health | grep -e '\"status\":\"UP\"'"]
+      interval: 10s
+      timeout: 10s
+      retries: 20
+
+  datamonitor2:
+    image: ${REGISTRY}/data-protection-monitor:0.0.1
+    hostname: datamonitor2
+    container_name: datamonitor2
+    links:
+      - client
+    depends_on:
+      client:
+        condition: service_healthy
+    ports:
+      - "9101:9101"
+    environment:
+      APP_ID: datamonitor
+      GROUP_ID: datamonitor
+      MAX_POLL_RECORDS: 500
+      FETCH_MIN_BYTES: 100000
+      FETCH_MAX_WAIT_MS: 500
+      BOOTSTRAP_URL: kafka1.${DOMAIN}:29092
+      SECURITY_PROTOCOL: PLAINTEXT
+      SCHEMA_REGISTRY_URL: http://schema1.${DOMAIN}:8081
+      INPUT_TOPIC: ^demo\.((?!governance).)*$$
+      OUTPUT_TOPIC: demo.governance.alerts
+      RULES_TOPIC: demo.governance.rules
+      PORT: 9101
+      JAVA_OPTS: >-
+        -Xms1G -Xmx1G
+    networks:
+      - kafka-network
+    healthcheck:
+      test: ["CMD", "bash", "-c", "curl http://datamonitor2.${DOMAIN}:9101/actuator/health | grep -e '\"status\":\"UP\"'"]
       interval: 10s
       timeout: 10s
       retries: 20
 
   schemamonitor:
-    image: com.mycompany/schema-monitor:0.0.1
+    image: ${REGISTRY}/schema-monitor:0.0.1
     hostname: schemamonitor
     container_name: schemamonitor
     links:
-      - consumer1
+      - client
     depends_on:
-      consumer1:
+      client:
         condition: service_healthy
     ports:
-      - "9004:9004"
+      - "9103:9103"
     environment:
       APP_ID: schemamonitor
       GROUP_ID: schemamonitor
@@ -317,14 +418,14 @@ services:
       SECURITY_PROTOCOL: PLAINTEXT
       SCHEMA_REGISTRY_URL: http://schema1.${DOMAIN}:8081
       SCHEMAS_TOPIC: _schemas
-      SCHEMA_AUDIT_TOPIC: demo.data.violation.schemas
-      PORT: 9004
+      SCHEMA_AUDIT_TOPIC: demo.governance.schemas
+      PORT: 9103
       JAVA_OPTS: >-
         -Xms1G -Xmx1G
     networks:
       - kafka-network
     healthcheck:
-      test: ["CMD", "bash", "-c", "curl http://schemamonitor.${DOMAIN}:9003/actuator/health | grep -e '\"status\":\"UP\"'"]
+      test: ["CMD", "bash", "-c", "curl http://schemamonitor.${DOMAIN}:9103/actuator/health | grep -e '\"status\":\"UP\"'"]
       interval: 10s
       timeout: 10s
       retries: 20

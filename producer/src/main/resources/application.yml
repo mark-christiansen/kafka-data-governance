@@ -8,6 +8,8 @@ application:
   messages: ${MESSAGES}
   batch.size: ${BATCH_SIZE}
   frequency.ms: ${FREQUENCY_MS:1000}
+  encrypt.fields: ${ENCRYPT_FIELDS:}
+  encode.fields: ${ENCODE_FIELDS:}
 
 # Kafka properties
 kafka:
@@ -33,4 +35,3 @@ kafka:
     bootstrap.servers: ${BOOTSTRAP_URL}
     security.protocol: ${SECURITY_PROTOCOL:PLAINTEXT}
     schema.registry.url: ${SCHEMA_REGISTRY_URL}
-    interceptor.classes: com.mycompany.kafka.governance.data.protection.interceptors.DataProtectionProducerInterceptor
